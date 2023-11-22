@@ -1,48 +1,33 @@
 #!/usr/bin/env python3
 import unicodedata
 
-
 ENTRADA = 'pt_pt.dic'
 SAIDA = 'palavras.txt'
 
-
 def normalizar(txt):
-    """Remove acentos e transforma 'A' ou 'ª' em 'a'."""
-    norm_txt = unicodedata.normalize('NFKD', txt).lower()
-    shaved = ''.join(c for c in norm_txt
-                     if not unicodedata.combining(c))
-    return unicodedata.normalize('NFC', shaved)
-
+    """Remove acentos e transforma em minúsculas."""
+    return ''.join(
+        c for c in unicodedata.normalize('NFKD', txt).lower()
+        if not unicodedata.combining(c)
+    )
 
 def chave(txt):
     """Manter palavras acentuadas após as não acentuadas"""
-    codigos = tuple(ord(c) for c in txt)
-    return (normalizar(txt), codigos)
-
+    return (normalizar(txt), tuple(ord(c) for c in txt))
 
 palavras = set()
 with open(ENTRADA, encoding='latin-1') as entrada:
-    for i, linha in enumerate(entrada):
-        if i == 0:
-            continue  # ignorar primeira linha (contagem)
-        linha = linha.strip()
-        linha = linha.split('/')[0]
-        partes = linha.split('-')
+    next(entrada)  # Pular a primeira linha
+    for linha in entrada:
+        palavra_base = linha.strip().split('/')[0]
+        partes = palavra_base.split('-')
         sufixo = partes[-1]
-        if len(sufixo) == 2 and sufixo.upper() == sufixo:
-            continue  # ignorrar nomes de cidades
-        if linha:  # para evitar palavra vazia
-            palavras.add(linha)  # incluir palavra composta
-        if len(partes) > 1:
-            for palavra in partes:
-                if palavra:
-                    palavras.add(palavra)  # para evitar palavra vazia
+        if len(sufixo) != 2 or sufixo.upper() != sufixo:
+            palavras.update(parte for parte in partes if parte)
 
-    qt_original = i
-
-msg = '{} palavras na lista original, {} na lista gerada: {} adicionadas'
+qt_original = sum(1 for _ in open(ENTRADA, encoding='latin-1')) - 1  # Contando as linhas excluindo a primeira
 extra = len(palavras) - qt_original
-print(msg.format(qt_original, len(palavras), extra))
+print(f'{qt_original} palavras na lista original, {len(palavras)} na lista gerada: {extra} adicionadas')
 
 palavras = sorted(palavras, key=chave)
 
