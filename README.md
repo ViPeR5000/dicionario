@@ -1,0 +1,2 @@
+# dicionario
+ dicionario-pt-pt
