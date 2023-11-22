@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import unicodedata
 
-ENTRADA = 'pt_pt.dic'
+ENTRADA = 'pt_PT.dic'
 SAIDA = 'palavras.txt'
 
 def normalizar(txt):
